@@ -1,0 +1,51 @@
+description: Removing an accepted value.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+            - asc
+            - desc
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+            - asc
+expect:
+- rule: request-enum-value-removed
+  severity: breaking

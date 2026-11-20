@@ -1,0 +1,45 @@
+description: 'OpenAPI 3.0 nullable: true removed.'
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tag:
+                    type: string
+                    nullable: true
+        responses:
+          '201':
+            description: Created
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tag:
+                    type: string
+        responses:
+          '201':
+            description: Created
+expect:
+- rule: request-nullable-removed
+  severity: breaking

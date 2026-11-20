@@ -1,0 +1,42 @@
+description: 'OpenAPI 3.1 type: [string, ''null''] in a response.'
+old:
+  openapi: 3.1.0
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    tag:
+                      type: string
+new:
+  openapi: 3.1.0
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    tag:
+                      type:
+                      - string
+                      - 'null'
+expect:
+- rule: response-nullable-added
+  severity: breaking

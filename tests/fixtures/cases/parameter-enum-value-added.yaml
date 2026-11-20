@@ -1,0 +1,51 @@
+description: Accepting one more value.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+            - asc
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+            - asc
+            - desc
+expect:
+- rule: request-enum-value-added
+  severity: non-breaking

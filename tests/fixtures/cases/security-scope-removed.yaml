@@ -1,0 +1,69 @@
+description: Fewer scopes needed.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        security:
+        - oauth:
+          - pets:read
+          - pets:write
+  components:
+    securitySchemes:
+      apiKey:
+        type: apiKey
+        in: header
+        name: X-API-Key
+      oauth:
+        type: oauth2
+        flows:
+          clientCredentials:
+            tokenUrl: https://auth.example.com/token
+            scopes:
+              pets:read: ''
+              pets:write: ''
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        security:
+        - oauth:
+          - pets:read
+  components:
+    securitySchemes:
+      apiKey:
+        type: apiKey
+        in: header
+        name: X-API-Key
+      oauth:
+        type: oauth2
+        flows:
+          clientCredentials:
+            tokenUrl: https://auth.example.com/token
+            scopes:
+              pets:read: ''
+              pets:write: ''
+expect:
+- rule: security-scope-removed
+  severity: non-breaking

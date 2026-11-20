@@ -1,0 +1,42 @@
+description: A field that was always returned may now be missing.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                  required:
+                  - id
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+expect:
+- rule: response-property-became-optional
+  severity: breaking

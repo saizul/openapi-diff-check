@@ -1,0 +1,38 @@
+name: Bug report
+description: A change was missed, misclassified, or the tool crashed
+labels: ["bug"]
+body:
+  - type: textarea
+    id: old
+    attributes:
+      label: Old spec (smallest part that shows the problem)
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: new
+    attributes:
+      label: New spec (same part, changed)
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: got
+    attributes:
+      label: What was reported (text or JSON output)
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect, and why?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "Output of: openapi-diff-check --version (or the image / action tag)"
+    validations:
+      required: true

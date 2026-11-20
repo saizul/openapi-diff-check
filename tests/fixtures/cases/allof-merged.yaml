@@ -1,0 +1,61 @@
+description: allOf parts are merged before comparing.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  allOf:
+                  - $ref: '#/components/schemas/Base'
+                  - type: object
+                    properties:
+                      name:
+                        type: string
+  components:
+    schemas:
+      Base:
+        type: object
+        properties:
+          id:
+            type: integer
+        required:
+        - id
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  allOf:
+                  - $ref: '#/components/schemas/Base'
+                  - type: object
+                    properties:
+                      name:
+                        type: string
+  components:
+    schemas:
+      Base:
+        type: object
+        properties:
+          id:
+            type: integer
+        required: []
+expect:
+- rule: response-property-became-optional
+  severity: breaking

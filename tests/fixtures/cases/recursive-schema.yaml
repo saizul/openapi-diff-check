@@ -1,0 +1,56 @@
+description: Recursive schemas terminate.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Node'
+  components:
+    schemas:
+      Node:
+        type: object
+        properties:
+          id:
+            type: integer
+          children:
+            type: array
+            items:
+              $ref: '#/components/schemas/Node'
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Node'
+  components:
+    schemas:
+      Node:
+        type: object
+        properties:
+          id:
+            type: string
+          children:
+            type: array
+            items:
+              $ref: '#/components/schemas/Node'
+expect:
+- rule: response-type-changed
+  severity: breaking

@@ -1,0 +1,50 @@
+description: Clients may still send it; most servers ignore unknown fields.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  tag:
+                    type: string
+                required:
+                - name
+        responses:
+          '201':
+            description: Created
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                required:
+                - name
+        responses:
+          '201':
+            description: Created
+expect:
+- rule: request-property-removed
+  severity: info

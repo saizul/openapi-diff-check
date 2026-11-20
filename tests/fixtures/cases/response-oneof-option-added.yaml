@@ -1,0 +1,49 @@
+description: A new shape in a response surprises clients.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  oneOf:
+                  - title: Cat
+                    type: object
+                    properties:
+                      meow:
+                        type: string
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  oneOf:
+                  - title: Cat
+                    type: object
+                    properties:
+                      meow:
+                        type: string
+                  - title: Dog
+                    type: object
+                    properties:
+                      bark:
+                        type: string
+expect:
+- rule: response-oneof-option-added
+  severity: breaking

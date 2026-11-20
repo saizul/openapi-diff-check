@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+      - name: Ruff
+        run: |
+          ruff check .
+          ruff format --check .
+
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+      - name: Test
+        run: pytest
+      - name: CLI smoke test
+        run: |
+          openapi-diff-check --version
+          openapi-diff-check tests/fixtures/specs/petstore-v1.yaml tests/fixtures/specs/petstore-v1.yaml
+          # breaking changes must exit 1
+          set +e
+          openapi-diff-check tests/fixtures/specs/petstore-v1.yaml tests/fixtures/specs/petstore-v2.json --format markdown
+          test $? -eq 1
+
+  action:
+    name: GitHub Action self-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - id: diff
+        uses: ./
+        with:
+          base: tests/fixtures/specs/petstore-v1.yaml
+          head: tests/fixtures/specs/petstore-v2.json
+          fail-on: never
+      - name: Check outputs
+        env:
+          BREAKING: ${{ steps.diff.outputs.breaking }}
+          EXIT_CODE: ${{ steps.diff.outputs.exit-code }}
+        run: |
+          test "$EXIT_CODE" = "0"
+          test "$BREAKING" = "9"
+          grep -q "9 breaking changes" openapi-diff.md
+
+  docker:
+    name: Docker image build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t openapi-diff-check:ci .
+      - run: docker run --rm openapi-diff-check:ci --version
+      - name: Compare the fixtures inside the container
+        run: |
+          docker run --rm -v "$PWD/tests/fixtures/specs:/work:ro" openapi-diff-check:ci \
+            petstore-v1.yaml petstore-v1.yaml

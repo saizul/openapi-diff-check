@@ -1,0 +1,55 @@
+description: Changes inside $ref'd components are found.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Pet'
+  components:
+    schemas:
+      Pet:
+        type: object
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+        required:
+        - id
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Pet'
+  components:
+    schemas:
+      Pet:
+        type: object
+        properties:
+          id:
+            type: integer
+        required:
+        - id
+expect:
+- rule: response-property-removed
+  severity: breaking
+location: response 200 application/json name

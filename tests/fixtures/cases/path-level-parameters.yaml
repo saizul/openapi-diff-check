@@ -1,0 +1,46 @@
+description: Parameters on the path item apply to every operation.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      parameters:
+      - name: tenant
+        in: query
+        required: false
+        schema:
+          type: string
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: string
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      parameters:
+      - name: tenant
+        in: query
+        required: true
+        schema:
+          type: string
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: string
+expect:
+- rule: parameter-became-required
+  severity: breaking

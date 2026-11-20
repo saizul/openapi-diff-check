@@ -1,0 +1,44 @@
+description: Header parameters are matched without case.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: X-Request-Id
+          in: header
+          required: false
+          schema:
+            type: string
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: x-request-id
+          in: header
+          required: false
+          schema:
+            type: string
+expect: []

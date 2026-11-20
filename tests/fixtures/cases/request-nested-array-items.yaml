@@ -1,0 +1,55 @@
+description: Changes inside array items are found.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        label:
+                          type: string
+        responses:
+          '201':
+            description: Created
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        label:
+                          type: integer
+        responses:
+          '201':
+            description: Created
+expect:
+- rule: request-type-changed
+  severity: breaking
+location: request body application/json tags[].label

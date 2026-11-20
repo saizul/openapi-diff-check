@@ -1,0 +1,74 @@
+openapi: 3.0.3
+info:
+  title: Petstore
+  version: 1.0.0
+security:
+  - apiKey: []
+paths:
+  /pets:
+    get:
+      operationId: listPets
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: A page of pets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./components/pet.yaml#/Pet"
+    post:
+      operationId: createPet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./components/pet.yaml#/NewPet"
+      responses:
+        "201":
+          description: Created
+  /pets/{petId}:
+    get:
+      operationId: getPet
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: A pet
+          content:
+            application/json:
+              schema:
+                $ref: "./components/pet.yaml#/Pet"
+        "404":
+          description: Not found
+    delete:
+      operationId: deletePet
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+components:
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        maximum: 100
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key

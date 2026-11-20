@@ -1,0 +1,46 @@
+description: Renaming a path parameter does not change the URL clients call.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets/{id}:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets/{petId}:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: string
+expect:
+- rule: path-parameter-renamed
+  severity: info

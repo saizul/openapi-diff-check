@@ -1,0 +1,46 @@
+description: integer to number accepts everything that was valid before.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: number
+expect:
+- rule: request-type-widened
+  severity: non-breaking

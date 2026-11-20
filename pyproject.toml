@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openapi-diff-check"
+dynamic = ["version"]
+description = "Detect breaking changes between two OpenAPI 3.0/3.1 specs (files or URLs, $ref aware): removed operations and fields, new required params, type, enum, constraint and security changes. Text, Markdown and JSON reports, ignore file, GitHub Action."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Saizul Amin" }]
+keywords = ["openapi", "openapi3", "breaking-changes", "api-diff", "swagger", "api-governance", "ci", "github-actions", "semver", "rest-api"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+    "Typing :: Typed",
+]
+dependencies = [
+    "httpx>=0.27,<1",
+    "PyYAML>=6.0,<7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "ruff>=0.4"]
+
+[project.urls]
+Homepage = "https://github.com/saizul/openapi-diff-check"
+Issues = "https://github.com/saizul/openapi-diff-check/issues"
+Changelog = "https://github.com/saizul/openapi-diff-check/blob/main/CHANGELOG.md"
+
+[project.scripts]
+openapi-diff-check = "openapi_diff_check.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "openapi_diff_check._version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+openapi_diff_check = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+src = ["src", "tests"]
+extend-exclude = ["*.md"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "C4", "SIM", "RUF"]
+ignore = ["SIM108", "RUF022", "RUF001"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]

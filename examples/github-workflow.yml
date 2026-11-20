@@ -1,0 +1,51 @@
+# Copy to .github/workflows/openapi-diff.yml. Compares the spec of the pull request with
+# the spec on the target branch, posts the report as one pull request comment (updated on
+# every push) and fails the check on breaking changes.
+name: OpenAPI diff
+
+on:
+  pull_request:
+    paths: ["openapi/**", "openapi.yaml"]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # A full checkout of the target branch, so relative $refs in the old spec resolve too.
+      - name: Check out the base branch
+        run: git worktree add "$RUNNER_TEMP/base" "origin/${{ github.base_ref }}"
+
+      - id: diff
+        uses: saizul/openapi-diff-check@v0.1.0
+        with:
+          base: ${{ runner.temp }}/base/openapi.yaml
+          head: openapi.yaml
+          fail-on: breaking
+
+      - name: Comment on the pull request
+        if: always() && steps.diff.outputs.markdown-file != ''
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const file = '${{ steps.diff.outputs.markdown-file }}';
+            if (!fs.existsSync(file)) return;
+            const body = fs.readFileSync(file, 'utf8');
+            const marker = '<!-- openapi-diff-check -->';
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });
+            const mine = comments.find(c => c.body && c.body.startsWith(marker));
+            if (mine) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }

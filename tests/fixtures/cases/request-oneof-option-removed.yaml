@@ -1,0 +1,53 @@
+description: Clients sending the removed shape break.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - title: Cat
+                  type: object
+                  properties:
+                    meow:
+                      type: string
+                - title: Dog
+                  type: object
+                  properties:
+                    bark:
+                      type: string
+        responses:
+          '201':
+            description: Created
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - title: Cat
+                  type: object
+                  properties:
+                    meow:
+                      type: string
+        responses:
+          '201':
+            description: Created
+expect:
+- rule: request-oneof-option-removed
+  severity: breaking

@@ -1,0 +1,52 @@
+description: 'With additionalProperties: false the old field is now rejected.'
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  tag:
+                    type: string
+                required:
+                - name
+                additionalProperties: false
+        responses:
+          '201':
+            description: Created
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                required:
+                - name
+                additionalProperties: false
+        responses:
+          '201':
+            description: Created
+expect:
+- rule: request-property-removed
+  severity: breaking

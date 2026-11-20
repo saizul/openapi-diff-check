@@ -1,0 +1,54 @@
+description: Parameters behind $ref.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - $ref: '#/components/parameters/Limit'
+  components:
+    parameters:
+      Limit:
+        name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - $ref: '#/components/parameters/Limit'
+  components:
+    parameters:
+      Limit:
+        name: limit
+        in: query
+        required: true
+        schema:
+          type: integer
+expect:
+- rule: parameter-became-required
+  severity: breaking

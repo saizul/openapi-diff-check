@@ -1,0 +1,40 @@
+description: The default response is compared like any other.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          default:
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    code:
+                      type: integer
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          default:
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+expect:
+- rule: response-type-changed
+  severity: breaking

@@ -1,0 +1,16 @@
+openapi: 3.0.3
+info:
+  title: Loop
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      responses:
+        "200":
+          $ref: "#/components/responses/A"
+components:
+  responses:
+    A:
+      $ref: "#/components/responses/B"
+    B:
+      $ref: "#/components/responses/A"

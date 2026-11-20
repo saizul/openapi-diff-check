@@ -1,0 +1,46 @@
+description: Paths are matched by template, so /pets/{a} equals /pets/{b}.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets/{a}:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: a
+          in: path
+          required: true
+          schema:
+            type: string
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets/{b}:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: b
+          in: path
+          required: true
+          schema:
+            type: string
+expect:
+- rule: path-parameter-renamed
+  severity: info

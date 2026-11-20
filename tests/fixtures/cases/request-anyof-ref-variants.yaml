@@ -1,0 +1,65 @@
+description: anyOf options are matched by component name.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/Cat'
+                - $ref: '#/components/schemas/Dog'
+        responses:
+          '201':
+            description: Created
+  components:
+    schemas:
+      Cat:
+        type: object
+        properties:
+          meow:
+            type: string
+      Dog:
+        type: object
+        properties:
+          bark:
+            type: string
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/Cat'
+        responses:
+          '201':
+            description: Created
+  components:
+    schemas:
+      Cat:
+        type: object
+        properties:
+          meow:
+            type: string
+      Dog:
+        type: object
+        properties:
+          bark:
+            type: string
+expect:
+- rule: request-anyof-option-removed
+  severity: breaking

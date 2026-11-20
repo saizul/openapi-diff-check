@@ -1,0 +1,33 @@
+name: New rule
+description: Ask for (or offer to add) detection of another kind of change
+labels: ["rule", "good first issue"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        See "Add a rule" and "Add a test case" in CONTRIBUTING.md. Most rules are a few lines plus two case files.
+  - type: textarea
+    id: change
+    attributes:
+      label: Which change should be detected?
+      description: Show a tiny old and new spec.
+      render: yaml
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Suggested severity
+      options: [breaking, non-breaking, info]
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Which clients break, and how?
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contribution
+      options:
+        - label: I would like to implement this

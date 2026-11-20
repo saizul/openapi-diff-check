@@ -1,0 +1,30 @@
+description: Clients reading X-Rate-Limit break.
+old:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            headers:
+              X-Rate-Limit:
+                schema:
+                  type: integer
+new:
+  openapi: 3.0.3
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+expect:
+- rule: response-header-removed
+  severity: breaking

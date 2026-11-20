@@ -1,0 +1,48 @@
+description: const is treated as a one-value enum.
+old:
+  openapi: 3.1.0
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                    const: v1
+        responses:
+          '201':
+            description: Created
+new:
+  openapi: 3.1.0
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      post:
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                    const: v2
+        responses:
+          '201':
+            description: Created
+expect:
+- rule: request-enum-value-removed
+  severity: breaking
+- rule: request-enum-value-added
+  severity: non-breaking

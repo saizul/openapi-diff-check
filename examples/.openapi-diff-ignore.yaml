@@ -1,0 +1,27 @@
+# Accepted changes. Put this file in the repository root as .openapi-diff-ignore.yaml
+# (it is picked up automatically) or pass it with --ignore.
+#
+# Every entry needs a reason. All given fields must match:
+#   rule         rule id, glob allowed ("response-enum-*", "*")
+#   path         path template as written in the new spec, glob allowed ("/admin/*")
+#   method       get, post, ...
+#   location     substring of the finding location ("parameter query.limit", "legacyId")
+#   fingerprint  exact fingerprint from the JSON report (rule|METHOD|path|location)
+#   expires      YYYY-MM-DD; after that date the entry stops applying and a warning is shown
+ignore:
+  - rule: response-enum-value-added
+    path: /pets*
+    location: status
+    reason: "All official SDKs map unknown statuses to UNKNOWN (#412)"
+
+  - rule: operation-removed
+    method: delete
+    path: /pets/{petId}
+    reason: "Deprecated since 2026-03, removal announced in the v2 changelog"
+    expires: 2027-06-30
+
+  - path: /internal/*
+    reason: "Internal endpoints are not part of the public contract"
+
+  - fingerprint: "request-constraint-narrowed|POST|/pets|request body application/json name"
+    reason: "The database column was always 50 characters"

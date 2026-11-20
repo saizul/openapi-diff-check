@@ -1,0 +1,80 @@
+name: OpenAPI diff check
+description: Fail on breaking changes between two OpenAPI 3.0/3.1 specs and write a Markdown report for pull request comments
+author: Saizul Amin
+branding:
+  icon: git-pull-request
+  color: orange
+
+inputs:
+  base:
+    description: Old spec (path or http(s) URL), usually the version from the target branch
+    required: true
+  head:
+    description: New spec (path or http(s) URL), usually the version from the pull request
+    required: true
+  fail-on:
+    description: "Lowest severity that fails the step: breaking, non-breaking, info or never"
+    default: breaking
+  ignore-file:
+    description: Ignore file with accepted changes (skipped when it does not exist)
+    default: .openapi-diff-ignore.yaml
+  remote-refs:
+    description: "Follow $ref to other http(s) documents: on or off"
+    default: "off"
+  markdown-file:
+    description: Where to write the Markdown report
+    default: openapi-diff.md
+  json-file:
+    description: Where to write the JSON report
+    default: openapi-diff.json
+  python-version:
+    description: Python used to run the tool
+    default: "3.12"
+
+outputs:
+  exit-code:
+    description: 0 no failing changes, 1 failing changes, 2 error
+    value: ${{ steps.diff.outputs.exit-code }}
+  breaking:
+    description: Number of breaking changes that are not ignored
+    value: ${{ steps.diff.outputs.breaking }}
+  markdown-file:
+    description: Path of the Markdown report
+    value: ${{ inputs.markdown-file }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v7
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Install openapi-diff-check
+      shell: bash
+      run: python -m pip install --quiet "$GITHUB_ACTION_PATH"
+    - name: Compare specs
+      id: diff
+      shell: bash
+      env:
+        BASE: ${{ inputs.base }}
+        HEAD_SPEC: ${{ inputs.head }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        IGNORE_FILE: ${{ inputs.ignore-file }}
+        REMOTE_REFS: ${{ inputs.remote-refs }}
+        MARKDOWN_FILE: ${{ inputs.markdown-file }}
+        JSON_FILE: ${{ inputs.json-file }}
+      run: |
+        set +e
+        args=("$BASE" "$HEAD_SPEC" --fail-on "$FAIL_ON" --remote-refs "$REMOTE_REFS"
+              --markdown-out "$MARKDOWN_FILE" --json-out "$JSON_FILE" --github-summary --color always)
+        if [ -n "$IGNORE_FILE" ] && [ -f "$IGNORE_FILE" ]; then
+          args+=(--ignore "$IGNORE_FILE")
+        fi
+        openapi-diff-check "${args[@]}"
+        code=$?
+        breaking=0
+        if [ -f "$JSON_FILE" ]; then
+          breaking=$(python -c 'import json, sys; print(json.load(open(sys.argv[1]))["summary"]["breaking"])' "$JSON_FILE")
+        fi
+        echo "exit-code=$code" >> "$GITHUB_OUTPUT"
+        echo "breaking=$breaking" >> "$GITHUB_OUTPUT"
+        exit $code

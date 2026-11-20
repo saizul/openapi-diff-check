@@ -1,0 +1,48 @@
+description: 'type: string -> [string, integer] accepts more.'
+old:
+  openapi: 3.1.0
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: string
+new:
+  openapi: 3.1.0
+  info:
+    title: Pets
+    version: 1.0.0
+  paths:
+    /pets:
+      get:
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+        parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type:
+            - string
+            - integer
+expect:
+- rule: request-type-widened
+  severity: non-breaking
