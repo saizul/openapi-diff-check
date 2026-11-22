@@ -5,13 +5,14 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+from fnmatch import fnmatchcase
 from pathlib import Path
 from typing import TextIO
 
 import httpx
 
 from openapi_diff_check._version import __version__
-from openapi_diff_check.diff import BREAKING, INFO, NON_BREAKING, SEVERITIES, compare
+from openapi_diff_check.diff import BREAKING, INFO, NON_BREAKING, SEVERITIES, Finding, compare
 from openapi_diff_check.ignore import DEFAULT_IGNORE_FILE, IgnoreFileError, apply_ignores, load_ignore
 from openapi_diff_check.loader import Resolver, SpecError, load_spec
 from openapi_diff_check.render import Report, render_json, render_markdown, render_text
@@ -62,6 +63,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="lowest severity shown in text output (default: info)",
     )
     parser.add_argument(
+        "--severity-override",
+        action="append",
+        default=[],
+        metavar="RULE=SEVERITY",
+        help="change the severity of a rule (glob allowed, e.g. 'response-enum-*=info'); repeatable, last match wins",
+    )
+    parser.add_argument(
         "--remote-refs",
         choices=("off", "on"),
         default="off",
@@ -69,6 +77,36 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--color", choices=("auto", "always", "never"), default="auto")
     return parser
+
+
+def parse_overrides(values: list[str]) -> list[tuple[str, str]]:
+    """Parse ``RULE=SEVERITY`` pairs; raise ``ValueError`` with a readable message."""
+    out = []
+    for raw in values:
+        rule, sep, severity = raw.partition("=")
+        rule, severity = rule.strip(), severity.strip().lower()
+        if not sep or not rule:
+            raise ValueError(f"--severity-override {raw!r}: expected RULE=SEVERITY")
+        if severity not in SEVERITIES:
+            raise ValueError(f"--severity-override {raw!r}: severity must be one of {', '.join(SEVERITIES)}")
+        out.append((rule, severity))
+    return out
+
+
+def apply_overrides(findings: list[Finding], overrides: list[tuple[str, str]]) -> list[str]:
+    """Reclassify findings in place. Returns warnings for overrides that matched nothing."""
+    used = [False] * len(overrides)
+    for finding in findings:
+        for index, (pattern, severity) in enumerate(overrides):
+            if fnmatchcase(finding.rule, pattern):
+                used[index] = True
+                finding.severity = severity
+    findings.sort(key=Finding.sort_key)
+    return [
+        f"--severity-override {pattern}={severity} matched no finding"
+        for (pattern, severity), hit in zip(overrides, used, strict=True)
+        if not hit
+    ]
 
 
 def _use_color(choice: str, stream: TextIO, environ: dict[str, str] | os._Environ[str]) -> bool:
@@ -91,6 +129,11 @@ def run(
     stderr = stderr or sys.stderr
     env = environ if environ is not None else dict(os.environ)
     args = build_parser().parse_args(argv)
+    try:
+        overrides = parse_overrides(args.severity_override)
+    except ValueError as exc:
+        print(f"error: {exc}", file=stderr)
+        return EXIT_ERROR
 
     try:
         allow_remote = args.remote_refs == "on"
@@ -104,7 +147,7 @@ def run(
         print("error: the specs are nested too deeply to compare", file=stderr)
         return EXIT_ERROR
 
-    warnings: list[str] = []
+    warnings: list[str] = apply_overrides(findings, overrides)
     ignore_path = args.ignore or (DEFAULT_IGNORE_FILE if Path(DEFAULT_IGNORE_FILE).is_file() else None)
     if ignore_path:
         if not Path(ignore_path).is_file():
