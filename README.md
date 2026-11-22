@@ -245,10 +245,19 @@ openapi-diff-check OLD NEW [options]
   -i, --ignore FILE                   ignore file (default: .openapi-diff-ignore.yaml if present)
   --fail-on {breaking,non-breaking,info,never}   (default: breaking)
   --min-severity {breaking,non-breaking,info}    lowest severity shown in text output
+  --severity-override RULE=SEVERITY   reclassify a rule (glob allowed); repeatable, last match wins
   --remote-refs {off,on}              follow $ref to other http(s) documents (default: off)
   --color {auto,always,never}         NO_COLOR is respected
   --version
 ```
+
+`--severity-override` changes how a rule is classified before the exit code is computed, for
+teams whose policy differs from the defaults. For example, if your clients tolerate new
+enum values in responses, `--severity-override 'response-enum-value-added=info'` keeps that
+from failing the build; `--severity-override 'operation-deprecated=breaking'` does the
+opposite. Rule names are shown in brackets in the text report and in the JSON `rule` field.
+An override that matches nothing produces a warning so typos are noticed. Unlike the ignore
+file, overrides apply to every matching finding and need no reason.
 
 The Python API is small too:
 
@@ -334,7 +343,7 @@ documents they reference.
 
 Good first issues are marked below; details are in [CONTRIBUTING.md](CONTRIBUTING.md#good-first-issues).
 
-- [ ] `--severity-override rule=severity` to reclassify rules without an ignore file *(good first issue)*
+- [x] `--severity-override rule=severity` to reclassify rules without an ignore file
 - [ ] `--header` for authenticated spec URLs *(good first issue)*
 - [ ] Webhooks (3.1 `webhooks`) comparison
 - [ ] Response `links` and callback comparison

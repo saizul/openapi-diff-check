@@ -25,22 +25,19 @@ Comment on an issue before you start so nobody else picks the same one.
 
 ## Good first issues
 
-1. **`--severity-override rule=severity`.** Repeatable flag that changes the severity of a
-   rule before the exit code is computed (`--severity-override response-enum-value-added=info`).
-   (`cli.py`, `tests/test_cli.py`)
-2. **`--header "Name: value"` for spec URLs.** Pass headers to `Resolver._get`, allow reading
+1. **`--header "Name: value"` for spec URLs.** Pass headers to `Resolver._get`, allow reading
    the value from an environment variable (`Authorization: env:SPEC_TOKEN`) so tokens stay out
    of logs. (`loader.py`, `cli.py`, tests with `httpx.MockTransport`)
-3. **Discriminator changes.** Report `discriminator.propertyName` changes and removed
+2. **Discriminator changes.** Report `discriminator.propertyName` changes and removed
    `mapping` entries as breaking. (`diff.py`, two case files)
-4. **Response header became optional.** A `required: true` response header that becomes
+3. **Response header became optional.** A `required: true` response header that becomes
    optional is breaking for clients. (`diff.py`, one case file)
-5. **`changelog` output format.** Group non-breaking additions by operation for release notes.
+4. **`changelog` output format.** Group non-breaking additions by operation for release notes.
    (`render.py`, `cli.py`, tests)
-6. **Servers changed.** Report removed `servers` URLs as info. (`diff.py`, one case file)
-7. **Deprecated property in responses.** `property-deprecated` is only reported for requests
+5. **Servers changed.** Report removed `servers` URLs as info. (`diff.py`, one case file)
+6. **Deprecated property in responses.** `property-deprecated` is only reported for requests
    today; report it for responses too. (`diff.py`, one case file)
-8. **Query parameter `allowEmptyValue` / `allowReserved`.** Treat turning them off as
+7. **Query parameter `allowEmptyValue` / `allowReserved`.** Treat turning them off as
    breaking. (`diff.py`, case files)
 
 ## Development setup

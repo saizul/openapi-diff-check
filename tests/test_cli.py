@@ -216,3 +216,27 @@ def test_expired_and_unused_entries_warn():
 def test_ignore_validation(data, message):
     with pytest.raises(IgnoreFileError, match=message):
         parse_ignore(data)
+
+
+def test_severity_override_reclassifies_and_changes_exit_code():
+    code, out, _ = cli(V1, V2, "--severity-override", "*=non-breaking")
+    assert code == 0
+    assert "Summary: 0 breaking, 10 non-breaking, 0 info, 0 ignored" in out
+    # the last matching override wins
+    code, out, _ = cli(V1, V2, "--severity-override", "*=info", "--severity-override", "parameter-added=breaking")
+    assert code == 1
+    assert "Summary: 1 breaking, 0 non-breaking, 9 info, 0 ignored" in out
+
+
+def test_severity_override_json_and_unused_warning():
+    code, out, _ = cli(V1, V2, "-f", "json", "--severity-override", "*=info", "--severity-override", "nope=info")
+    assert code == 0
+    doc = json.loads(out)
+    assert {f["severity"] for f in doc["findings"]} == {"info"}
+    assert any("nope=info matched no finding" in w for w in doc["warnings"])
+
+
+@pytest.mark.parametrize("value", ["path-removed", "=info", "path-removed=fatal"])
+def test_severity_override_invalid(value):
+    code, _, err = cli(V1, V2, "--severity-override", value)
+    assert code == 2 and "--severity-override" in err
