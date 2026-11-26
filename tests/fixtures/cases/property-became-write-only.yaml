@@ -1,0 +1,63 @@
+description: A returned property becomes writeOnly, so responses stop containing it.
+old:
+  openapi: 3.0.3
+  info:
+    title: Users
+    version: 1.0.0
+  paths:
+    /users:
+      post:
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        responses:
+          '201':
+            description: Created
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/User'
+  components:
+    schemas:
+      User:
+        type: object
+        properties:
+          id:
+            type: string
+          password:
+            type: string
+new:
+  openapi: 3.0.3
+  info:
+    title: Users
+    version: 1.0.0
+  paths:
+    /users:
+      post:
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        responses:
+          '201':
+            description: Created
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/User'
+  components:
+    schemas:
+      User:
+        type: object
+        properties:
+          id:
+            type: string
+          password:
+            type: string
+            writeOnly: true
+expect:
+- rule: response-property-became-write-only
+  severity: breaking

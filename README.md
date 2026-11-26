@@ -187,9 +187,12 @@ Header parameters are matched case-insensitively.
 | `format` changed (`*-format-changed`) | breaking | breaking |
 | `oneOf`/`anyOf` option removed (`*-oneof-option-removed`, `*-anyof-option-removed`) | breaking | non-breaking |
 | `oneOf`/`anyOf` option added (`*-oneof-option-added`, `*-anyof-option-added`) | non-breaking | breaking |
+| Property became `readOnly` (`request-property-became-read-only`) / no longer `readOnly` | breaking / non-breaking | - |
+| Property became `writeOnly` (`response-property-became-write-only`) / no longer `writeOnly` | - | breaking / non-breaking |
 | `default` changed (`default-changed`), property deprecated (`property-deprecated`) | info | info |
 
-`readOnly` properties are skipped in requests and `writeOnly` properties in responses.
+Apart from the `readOnly`/`writeOnly` flips above, `readOnly` properties are skipped in requests
+and `writeOnly` properties in responses.
 `allOf` parts are merged before comparing; `oneOf`/`anyOf` options are matched by `$ref`
 name, then `title`, then position.
 
