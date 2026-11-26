@@ -10,6 +10,14 @@ All notable changes to this project are documented here. The format follows
 
 - `--severity-override RULE=SEVERITY` (repeatable, glob patterns, last match wins) to
   reclassify rules before the exit code is computed; unused overrides produce a warning.
+- Rules for `readOnly`/`writeOnly` flips on existing properties:
+  `request-property-became-read-only` (breaking), `request-property-no-longer-read-only`,
+  `response-property-became-write-only` (breaking) and `response-property-no-longer-write-only`.
+
+### Fixed
+
+- A property that became `readOnly` (requests) or `writeOnly` (responses) was skipped
+  entirely, so the change was not reported at all.
 
 ## [0.1.0] - 2026-11-20
 

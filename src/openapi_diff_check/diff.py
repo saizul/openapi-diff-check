@@ -783,6 +783,8 @@ class Differ:
             old_req, new_req = name in old.required, name in new.required
             new_prop = self._raw(self.new, new.properties[name]) if in_new else {}
             old_prop = self._raw(self.old, old.properties[name]) if in_old else {}
+            if in_old and in_new:
+                self._compare_access(name, old_prop, new_prop, direction, loc)
             if req and (new_prop.get("readOnly") or old_prop.get("readOnly")):
                 continue
             if not req and (new_prop.get("writeOnly") or old_prop.get("writeOnly")):
@@ -827,6 +829,43 @@ class Differ:
             if in_old and in_new:
                 (o, ob), (n, nb) = old.properties[name], new.properties[name]
                 self._schema(o, ob, n, nb, direction, where, child)
+
+    def _compare_access(
+        self, name: str, old_prop: dict[str, Any], new_prop: dict[str, Any], direction: str, loc: str
+    ) -> None:
+        """readOnly / writeOnly flips on a property that exists on both sides."""
+        if direction == REQUEST:
+            was, now = bool(old_prop.get("readOnly")), bool(new_prop.get("readOnly"))
+            if not was and now:
+                self.add(
+                    "request-property-became-read-only",
+                    BREAKING,
+                    f"property {name!r} became readOnly; values sent by clients are ignored or rejected",
+                    loc,
+                )
+            elif was and not now:
+                self.add(
+                    "request-property-no-longer-read-only",
+                    NON_BREAKING,
+                    f"property {name!r} is no longer readOnly and can be sent",
+                    loc,
+                )
+        else:
+            was, now = bool(old_prop.get("writeOnly")), bool(new_prop.get("writeOnly"))
+            if not was and now:
+                self.add(
+                    "response-property-became-write-only",
+                    BREAKING,
+                    f"property {name!r} became writeOnly and is no longer returned",
+                    loc,
+                )
+            elif was and not now:
+                self.add(
+                    "response-property-no-longer-write-only",
+                    NON_BREAKING,
+                    f"property {name!r} is no longer writeOnly and may be returned",
+                    loc,
+                )
 
     def _raw(self, spec: Spec, prop: tuple[Any, str]) -> dict[str, Any]:
         node, _ = spec.resolve(prop[0], prop[1])

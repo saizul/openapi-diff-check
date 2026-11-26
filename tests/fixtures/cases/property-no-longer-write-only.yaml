@@ -1,0 +1,63 @@
+description: A writeOnly property is now returned in responses.
+old:
+  openapi: 3.0.3
+  info:
+    title: Users
+    version: 1.0.0
+  paths:
+    /users:
+      post:
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        responses:
+          '201':
+            description: Created
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/User'
+  components:
+    schemas:
+      User:
+        type: object
+        properties:
+          id:
+            type: string
+          token:
+            type: string
+            writeOnly: true
+new:
+  openapi: 3.0.3
+  info:
+    title: Users
+    version: 1.0.0
+  paths:
+    /users:
+      post:
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        responses:
+          '201':
+            description: Created
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/User'
+  components:
+    schemas:
+      User:
+        type: object
+        properties:
+          id:
+            type: string
+          token:
+            type: string
+expect:
+- rule: response-property-no-longer-write-only
+  severity: non-breaking
